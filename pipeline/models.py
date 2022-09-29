@@ -1,5 +1,4 @@
 import pathlib
-import re
 import shlex
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Optional, Set, TypedDict
@@ -15,10 +14,6 @@ from .validation import (
     validate_cohortextractor_outputs,
     validate_databuilder_outputs,
 )
-
-
-cohortextractor_pat = re.compile(r"cohortextractor:\S+ generate_cohort")
-databuilder_pat = re.compile(r"databuilder:\S+ generate[-_]dataset")
 
 
 class Expectations(BaseModel):
@@ -152,12 +147,13 @@ class Pipeline(BaseModel):
     ) -> PartiallyValidatedPipeline:
         # TODO: move to Action when we move name onto it
         validators = {
-            cohortextractor_pat: validate_cohortextractor_outputs,
-            databuilder_pat: validate_databuilder_outputs,
+            "cohortextractor:latest generate_cohort": validate_cohortextractor_outputs,
+            "cohortextractor-v2:latest generate_cohort": validate_databuilder_outputs,
+            "databuilder:latest generate_dataset": validate_databuilder_outputs,
         }
         for action_id, config in values.get("actions", {}).items():
             for cmd, validator_func in validators.items():
-                if cmd.match(config.run.raw):
+                if config.run.raw.startswith(cmd):
                     validator_func(action_id, config)
 
         return values
