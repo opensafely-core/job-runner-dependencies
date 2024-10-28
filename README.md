@@ -1,3 +1,9 @@
+# DEPRECATED
+
+We now deploy job-runner as a docker iamge.
+
+## job-runner-dependencies
+
 This is contains the pure-python dependencies needed to run job-runner.
 
 It is intended for use in OpenSAFELY backends, where we can access Github but
